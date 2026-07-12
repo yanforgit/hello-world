@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>回家检查事项清单</title>
+  <style>
+    /* 引入可爱的 Google Fonts 字体 */
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700;900&family=ZCOOL+KuaiLe&display=swap');
+
+    :root {
+      --ink: #3c2a1a;
+      --border-color: #5d3f2e;
+      --paper-bg: #fffbf4;
+      --page-bg: #fdf5e6;
+      --accent-pet: #f5b041;
+      --accent-pet-hover: #fdf2e2;
+      --accent-prep: #3498db;
+      --accent-prep-hover: #ebf5fb;
+      --accent-carry: #7bad47;
+      --accent-carry-hover: #f1f9ec;
+      --accent-must: #3c8f62;
+      --accent-must-hover: #e8f8f5;
+      
+      --radius: 24px;
+      --shadow: 5px 5px 0 #5d3f2e;
+      color-scheme: light;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background-color: var(--page-bg);
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.7) 0 8rem, transparent 8.5rem),
+        radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.6) 0 10rem, transparent 10.5rem);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Quicksand", system-ui, sans-serif;
+      color: var(--ink);
+    }
+
+    .page {
+      width: min(100%, 800px);
+      margin: 0 auto;
+      padding: 20px clamp(12px, 3vw, 24px) 40px;
+    }
+
+    /* 顶部 Hero 区 */
+    .hero {
+      position: relative;
+      background: linear-gradient(135deg, #bfe7ff 0%, #fff5df 100%);
+      border: 3.5px solid var(--border-color);
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      padding: 28px 18px 0;
+      overflow: hidden;
+    }
+
+    /* 卡通飘云 */
+    .cloud {
+      position: absolute;
+      pointer-events: none;
+      z-index: 1;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+    .cloud.one {
+      top: 15px;
+      left: 10px;
+      animation-delay: 0s;
+    }
+    .cloud.two {
+      top: 35px;
+      right: 15px;
+      animation-delay: -4s;
+    }
+
+    /* 卡通小飞机与航线 */
+    .plane-path {
+      position: absolute;
+      right: 50px;
+      top: 45px;
+      width: 75px;
+      height: 35px;
+      border-top: 2.5px dashed rgba(93, 63, 46, 0.4);
+      border-radius: 50%;
+      transform: rotate(-8deg);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .plane {
+      position: absolute;
+      right: 15px;
+      top: 20px;
+      font-size: 28px;
+      transform: rotate(-10deg);
+      animation: planeFloat 4s ease-in-out infinite alternate;
+      z-index: 2;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: clamp(28px, 7vw, 42px);
+      color: #17314f;
+      line-height: 1.1;
+      letter-spacing: 1px;
+    }
+
+    .home-word {
+      display: inline-block;
+      color: #db4b17;
+      transform: rotate(-5deg) scale(1.08);
+      margin-right: 5px;
+      text-shadow: 2px 2px 0px #fff;
+    }
+
+    .subtitle {
+      position: relative;
+      display: inline-block;
+      margin: 10px 0 20px;
+      font-size: clamp(14px, 4vw, 17px);
+      color: #7f3b1f;
+      font-weight: 700;
+    }
+
+    .subtitle::after {
+      content: "";
+      position: absolute;
+      left: -5%;
+      right: -5%;
+      bottom: -6px;
+      height: 3px;
+      border-radius: 999px;
+      background: #db4b17;
+      transform: rotate(-1.5deg);
+      opacity: 0.7;
+    }
+
+    /* 顶部插画地面区 */
+    .hero-art {
+      position: relative;
+      height: 75px;
+      width: 100%;
+      margin-top: 10px;
+      border-bottom: 3.5px solid var(--border-color); /* 地面线 */
+    }
+
+    /* 卡通小屋 */
+    .house {
+      position: absolute;
+      left: 10px;
+      bottom: 0;
+      width: 80px;
+      height: 60px;
+      z-index: 2;
+    }
+    .house-chimney {
+      position: absolute;
+      left: 14px;
+      top: 4px;
+      width: 8px;
+      height: 16px;
+      background: #c0392b;
+      border: 2.5px solid var(--border-color);
+      border-radius: 1px;
+    }
+    .house-smoke-box {
+      position: absolute;
+      left: 10px;
+      top: -18px;
+      width: 16px;
+      height: 20px;
+    }
+    .smoke {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 50%;
+      opacity: 0;
+    }
+    .smoke:nth-child(1) { animation: smokeDrift 3s infinite 0s; left: 3px; }
+    .smoke:nth-child(2) { animation: smokeDrift 3s infinite 1s; left: 7px; }
+    .smoke:nth-child(3) { animation: smokeDrift 3s infinite 2s; left: 1px; }
+
+    .house-roof {
+      position: absolute;
+      left: 6px;
+      top: 12px;
+      width: 68px;
+      height: 16px;
+      background: #e9573f;
+      border: 2.5px solid var(--border-color);
+      border-radius: 3px;
+      transform: skewX(-12deg);
+    }
+    .house-body {
+      position: absolute;
+      left: 13px;
+      bottom: 0;
+      width: 54px;
+      height: 34px;
+      background: #ffe5b4;
+      border: 2.5px solid var(--border-color);
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+    }
+    .house-window {
+      position: absolute;
+      left: 8px;
+      top: 6px;
+      width: 12px;
+      height: 12px;
+      background: #e0f7fa;
+      border: 2px solid var(--border-color);
+      border-radius: 3px;
+    }
+    .house-door {
+      position: absolute;
+      right: 8px;
+      bottom: 0;
+      width: 14px;
+      height: 22px;
+      background: #8d6e63;
+      border: 2px solid var(--border-color);
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+    }
+
+    /* 卡通篱笆 */
+    .fence {
+      position: absolute;
+      left: 90px;
+      right: 80px;
+      bottom: 0;
+      height: 16px;
+      background: 
+        linear-gradient(90deg, #ffffff 0 5px, transparent 5px 12px) 0 0 / 12px 16px,
+        linear-gradient(#ffffff 0 0) 0 8px / 100% 3px no-repeat;
+      border-top: none;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    /* 黄色行李箱 */
+    .suitcase {
+      position: absolute;
+      right: 15px;
+      bottom: 0;
+      width: 48px;
+      height: 56px;
+      background: #f4d03f;
+      border: 3px solid var(--border-color);
+      border-radius: 10px;
+      transform: rotate(3deg);
+      z-index: 2;
+    }
+    .suitcase-handle {
+      position: absolute;
+      left: 50%;
+      top: -12px;
+      width: 18px;
+      height: 12px;
+      border: 3px solid var(--border-color);
+      border-bottom: none;
+      border-radius: 5px 5px 0 0;
+      transform: translateX(-50%);
+    }
+    .suitcase-strap {
+      position: absolute;
+      top: 0;
+      width: 5px;
+      height: 100%;
+      background: #d4ac0d;
+      border-left: 1.5px solid var(--border-color);
+      border-right: 1.5px solid var(--border-color);
+    }
+    .suitcase-strap.left { left: 10px; }
+    .suitcase-strap.right { right: 10px; }
+    .suitcase-wheel {
+      position: absolute;
+      bottom: -6px;
+      width: 8px;
+      height: 6px;
+      background: #424242;
+      border: 2px solid var(--border-color);
+      border-radius: 50%;
+    }
+    .suitcase-wheel.left { left: 8px; }
+    .suitcase-wheel.right { right: 8px; }
+
+    /* 总进度卡片 */
+    .progress-panel {
+      background: var(--paper-bg);
+      border: 3.5px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .progress-title {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 22px;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+    .progress-count {
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 900;
+      font-size: 17px;
+      color: #7f3b1f;
+      background: #fff;
+      padding: 3px 10px;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+    }
+    .progress-track {
+      height: 18px;
+      background: #fff;
+      border: 3px solid var(--border-color);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #f5b041, #7bad47);
+      border-radius: 999px;
+      transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+    }
+    .progress-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .remaining-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .remaining-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: #7f3b1f;
+    }
+    .complete-tag {
+      display: none;
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 16px;
+      color: #db4b17;
+      animation: heartbeat 1.5s infinite alternate;
+    }
+    body.all-done .complete-tag {
+      display: inline-block;
+    }
+    .reset-button {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 14px;
+      background: #e74c3c;
+      color: white;
+      border: 3.5px solid var(--border-color);
+      border-radius: 14px;
+      padding: 6px 14px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 var(--border-color);
+      transition: all 0.1s;
+    }
+    .reset-button:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--border-color);
+    }
+
+    /* 模块卡片列表 */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--paper-bg);
+      border: 3.5px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: cardFadeIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1) both;
+    }
+    .card:nth-child(1) { animation-delay: 0.05s; }
+    .card:nth-child(2) { animation-delay: 0.15s; }
+    .card:nth-child(3) { animation-delay: 0.25s; }
+    .card:nth-child(4) { animation-delay: 0.35s; }
+
+    .card[data-section="pet"] { --accent: var(--accent-pet); --accent-hover: var(--accent-pet-hover); }
+    .card[data-section="prep"] { --accent: var(--accent-prep); --accent-hover: var(--accent-prep-hover); }
+    .card[data-section="personal"] { --accent: var(--accent-carry); --accent-hover: var(--accent-carry-hover); }
+    .card[data-section="must"] { --accent: var(--accent-must); --accent-hover: var(--accent-must-hover); }
+
+    .card-header {
+      background: var(--accent);
+      border-bottom: 3.5px solid var(--border-color);
+      padding: 12px 18px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-title {
+      margin: 0;
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 20px;
+      letter-spacing: 0.5px;
+      text-shadow: 1.5px 1.5px 0 var(--border-color);
+    }
+    .card-progress {
+      text-align: right;
+    }
+    .card-progress-text {
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 900;
+      font-size: 13px;
+      color: white;
+      text-shadow: 1px 1px 0 var(--border-color);
+    }
+    .card-progress-bar {
+      width: 70px;
+      height: 8px;
+      background: white;
+      border: 2px solid var(--border-color);
+      border-radius: 4px;
+      margin-top: 3px;
+      overflow: hidden;
+    }
+    .card-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #ffd25a;
+      transition: width 0.3s ease;
+    }
+
+    .card-body {
+      padding: 16px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 检查事项列表 */
+    .check-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      background: white;
+      border: 3px solid var(--border-color);
+      border-radius: 14px;
+      box-shadow: 3px 3px 0 var(--border-color);
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+      user-select: none;
+    }
+    .check-item:hover {
+      background: var(--accent-hover);
+    }
+    .check-item:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--border-color);
+    }
+    .check-item.done {
+      background: var(--accent-hover);
+      box-shadow: 1px 1px 0 var(--border-color);
+      transform: translate(2px, 2px);
+    }
+    
+    /* 复选框样式 */
+    .box {
+      width: 22px;
+      height: 22px;
+      border: 3px solid var(--border-color);
+      border-radius: 6px;
+      background: white;
+      position: relative;
+      flex-shrink: 0;
+      transition: background-color 0.15s;
+    }
+    .check-item.done .box {
+      background-color: var(--accent);
+    }
+    .check-item.done .box::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 1px;
+      width: 5px;
+      height: 9px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      transform: rotate(45deg);
+    }
+
+    .item-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      transition: color 0.15s, text-decoration 0.15s;
+    }
+    .check-item.done .item-text {
+      color: #9aa2a8;
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+    }
+
+    /* 必选卡片中的子分类 */
+    .subcategory {
+      border-top: 2.5px dashed var(--border-color);
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+    .subcategory:first-child {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0;
+    }
+    .subcategory-title {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 16px;
+      color: var(--border-color);
+      margin: 0 0 10px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ==========================================
+       CSS 插画部分 (Responsive & Cute Animations)
+       ========================================== */
+
+    /* 1. 小狗饺子 (小家伙用品卡片) */
+    .dog-zone {
+      position: relative;
+      margin: 15px auto 0;
+      width: 140px;
+      height: 100px;
+      display: block;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .dog {
+      position: absolute;
+      right: 10px;
+      bottom: 0;
+      width: 66px;
+      height: 80px;
+      transform-origin: bottom center;
+    }
+    .dog-body {
+      position: absolute;
+      bottom: 0;
+      left: 10px;
+      width: 46px;
+      height: 42px;
+      background: white;
+      border: 3px solid var(--border-color);
+      border-radius: 20px 20px 10px 10px;
+      z-index: 2;
+    }
+    .dog-head {
+      position: absolute;
+      top: 12px;
+      left: 3px;
+      width: 60px;
+      height: 50px;
+      background: white;
+      border: 3px solid var(--border-color);
+      border-radius: 30px 30px 24px 24px;
+      z-index: 4;
+    }
+    .dog-ear-l, .dog-ear-r {
+      position: absolute;
+      top: 16px;
+      width: 16px;
+      height: 32px;
+      background: white;
+      border: 3px solid var(--border-color);
+      border-radius: 12px;
+      z-index: 3;
+      transform-origin: top center;
+    }
+    .dog-ear-l {
+      left: -4px;
+      transform: rotate(15deg);
+      animation: earWobbleL 4s infinite alternate ease-in-out;
+    }
+    .dog-ear-r {
+      right: -4px;
+      transform: rotate(-15deg);
+      animation: earWobbleR 4s infinite alternate ease-in-out;
+    }
+    .dog-eye-l, .dog-eye-r {
+      position: absolute;
+      top: 19px;
+      width: 6px;
+      height: 6px;
+      background: var(--border-color);
+      border-radius: 50%;
+      animation: blink 4.5s infinite;
+    }
+    .dog-eye-l { left: 16px; }
+    .dog-eye-r { right: 16px; }
+    .dog-snout {
+      position: absolute;
+      top: 23px;
+      left: 17px;
+      width: 26px;
+      height: 20px;
+      background: #fdf5e6;
+      border-radius: 50%;
+    }
+    .dog-nose {
+      position: absolute;
+      top: 22px;
+      left: 26px;
+      width: 8px;
+      height: 5px;
+      background: var(--border-color);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .dog-mouth {
+      position: absolute;
+      top: 28px;
+      left: 27px;
+      width: 6px;
+      height: 4px;
+      border-bottom: 2px solid var(--border-color);
+      border-radius: 0 0 3px 3px;
+    }
+    .dog-tail {
+      position: absolute;
+      bottom: 10px;
+      left: 4px;
+      width: 14px;
+      height: 14px;
+      background: white;
+      border: 3px solid var(--border-color);
+      border-radius: 50%;
+      transform-origin: right bottom;
+      animation: tailWag 0.6s infinite alternate ease-in-out;
+      z-index: 1;
+    }
+    .dog-bib {
+      position: absolute;
+      bottom: 24px;
+      left: 15px;
+      width: 36px;
+      height: 20px;
+      background: #f1c40f;
+      border: 2.5px solid var(--border-color);
+      border-radius: 0 0 16px 16px;
+      z-index: 5;
+      color: var(--border-color);
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 10px;
+      text-align: center;
+      line-height: 15px;
+      font-weight: bold;
+    }
+
+    /* 狗碗与蓝球 */
+    .dog-bowl {
+      position: absolute;
+      left: 5px;
+      bottom: 0;
+      width: 30px;
+      height: 15px;
+      background: #e74c3c;
+      border: 2.5px solid var(--border-color);
+      border-radius: 10px 10px 4px 4px;
+      z-index: 3;
+    }
+    .dog-bowl::before {
+      content: '🐾';
+      position: absolute;
+      left: 50%;
+      top: 45%;
+      transform: translate(-50%, -50%);
+      font-size: 8px;
+      color: white;
+    }
+    .dog-kibble {
+      position: absolute;
+      left: 7px;
+      bottom: 11px;
+      width: 26px;
+      height: 8px;
+      background: #a0522d;
+      border: 2px solid var(--border-color);
+      border-radius: 8px 8px 0 0;
+      z-index: 2;
+    }
+    .dog-ball {
+      position: absolute;
+      left: 36px;
+      bottom: 0;
+      width: 12px;
+      height: 12px;
+      background: #3498db;
+      border: 2px solid var(--border-color);
+      border-radius: 50%;
+      z-index: 3;
+    }
+
+    /* 2. 出发前准备卡片中的小飞机 */
+    .travel-art {
+      position: relative;
+      margin: 15px auto 0;
+      width: 90px;
+      height: 50px;
+      display: block;
+      pointer-events: none;
+    }
+    .tiny-cloud {
+      position: absolute;
+      left: 5px;
+      bottom: 2px;
+      width: 44px;
+      height: 16px;
+      background: white;
+      border: 2.5px solid var(--border-color);
+      border-radius: 8px;
+    }
+    .tiny-cloud::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: -7px;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-top: 2.5px solid var(--border-color);
+      border-left: 2.5px solid var(--border-color);
+      border-radius: 50%;
+    }
+    .tiny-cloud::after {
+      content: '';
+      position: absolute;
+      right: 8px;
+      top: -10px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-top: 2.5px solid var(--border-color);
+      border-right: 2.5px solid var(--border-color);
+      border-radius: 50%;
+    }
+    .tiny-plane-draw {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 42px;
+      height: 16px;
+      background: #3498db;
+      border: 2.5px solid var(--border-color);
+      border-radius: 10px 14px 10px 4px;
+      transform: rotate(-10deg);
+      animation: planeFloat 3s infinite ease-in-out alternate;
+    }
+    .tiny-plane-draw::before {
+      content: '';
+      position: absolute;
+      left: 12px;
+      top: -8px;
+      width: 8px;
+      height: 10px;
+      background: white;
+      border: 2.5px solid var(--border-color);
+      border-radius: 2px;
+      transform: skewX(-15deg);
+    }
+    .tiny-plane-draw::after {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: -8px;
+      width: 8px;
+      height: 8px;
+      background: #e74c3c;
+      border: 2.5px solid var(--border-color);
+      border-radius: 2px;
+    }
+
+    /* 3. 个人物品卡片中的水杯、钱包、钥匙、手机 */
+    .personal-art {
+      position: relative;
+      margin: 15px auto 0;
+      width: 100px;
+      height: 50px;
+      display: block;
+      pointer-events: none;
+    }
+    .flask-draw {
+      position: absolute;
+      left: 5px;
+      bottom: 0;
+      width: 14px;
+      height: 40px;
+      background: #16a085;
+      border: 2.5px solid var(--border-color);
+      border-radius: 4px;
+    }
+    .flask-draw::before {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: 0.5px;
+      width: 8px;
+      height: 5px;
+      background: #7f8c8d;
+      border: 2px solid var(--border-color);
+      border-radius: 2px 2px 0 0;
+    }
+    .wallet-draw {
+      position: absolute;
+      left: 24px;
+      bottom: 2px;
+      width: 28px;
+      height: 22px;
+      background: #d35400;
+      border: 2.5px solid var(--border-color);
+      border-radius: 4px;
+      transform: rotate(5deg);
+    }
+    .wallet-draw::before {
+      content: '';
+      position: absolute;
+      right: 3px;
+      top: 5px;
+      width: 8px;
+      height: 7px;
+      background: #f39c12;
+      border: 1.5px solid var(--border-color);
+      border-radius: 2px;
+    }
+    .keys-draw {
+      position: absolute;
+      right: 30px;
+      bottom: 2px;
+      width: 18px;
+      height: 18px;
+    }
+    .keys-draw::before {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--border-color);
+      border-radius: 50%;
+    }
+    .keys-draw::after {
+      content: '🔑';
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      font-size: 11px;
+      transform: rotate(45deg);
+    }
+    .phone-draw {
+      position: absolute;
+      right: 5px;
+      bottom: 0;
+      width: 20px;
+      height: 36px;
+      background: #2c3e50;
+      border: 2.5px solid var(--border-color);
+      border-radius: 4px;
+      transform: rotate(-6deg);
+    }
+    .phone-draw::before {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      background: #aee0f7;
+      border-radius: 2px;
+    }
+
+    /* 4. 必携物品卡片中的雨伞与落雨 */
+    .must-art {
+      position: relative;
+      margin: 15px auto 0;
+      width: 90px;
+      height: 50px;
+      display: block;
+      pointer-events: none;
+    }
+    .umbrella-draw {
+      position: absolute;
+      right: 15px;
+      bottom: 0;
+      width: 40px;
+      height: 44px;
+      transform: rotate(8deg);
+    }
+    .umbrella-canopy {
+      position: absolute;
+      top: 0;
+      width: 40px;
+      height: 20px;
+      background: #2ecc71;
+      border: 2.5px solid var(--border-color);
+      border-radius: 20px 20px 0 0;
+    }
+    .umbrella-shaft {
+      position: absolute;
+      left: 18px;
+      top: 20px;
+      width: 4px;
+      height: 18px;
+      background: var(--border-color);
+    }
+    .umbrella-handle {
+      position: absolute;
+      left: 12px;
+      bottom: 2px;
+      width: 10px;
+      height: 6px;
+      border: 2.5px solid var(--border-color);
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+    }
+    .rain-draw {
+      position: absolute;
+      left: 10px;
+      top: 2px;
+      width: 25px;
+      height: 35px;
+    }
+    .drop {
+      position: absolute;
+      width: 2.5px;
+      height: 6px;
+      background: #3498db;
+      border-radius: 50%;
+      animation: rainFall 1.5s infinite linear;
+    }
+    .drop:nth-child(1) { left: 4px; top: 0px; animation-delay: 0s; }
+    .drop:nth-child(2) { left: 12px; top: 8px; animation-delay: 0.5s; }
+    .drop:nth-child(3) { left: 20px; top: 3px; animation-delay: 1s; }
+
+    /* 全勾选完成时小狗头上冒出的爱心 */
+    .heart-bubble {
+      position: absolute;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    body.all-done .heart-bubble.h1 { animation: heartFloat1 2s infinite ease-out 0s; }
+    body.all-done .heart-bubble.h2 { animation: heartFloat2 2s infinite ease-out 0.6s; }
+    body.all-done .heart-bubble.h3 { animation: heartFloat3 2s infinite ease-out 1.2s; }
+
+    /* ==========================================
+       响应式布局 (PC 宽屏适配)
+       ========================================== */
+    @media (min-width: 600px) {
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+        align-items: start;
+      }
+      .card-body {
+        position: relative;
+        padding-bottom: 20px;
+      }
+      /* PC端下，插画均 absolute 定位在右下角，防止挡住列表 */
+      .dog-zone, .travel-art, .personal-art, .must-art {
+        position: absolute;
+        margin: 0;
+        transform: scale(1);
+      }
+      .dog-zone {
+        right: 12px;
+        bottom: 12px;
+      }
+      .travel-art {
+        right: 12px;
+        bottom: 12px;
+      }
+      .personal-art {
+        right: 12px;
+        bottom: 12px;
+      }
+      .must-art {
+        right: 12px;
+        bottom: 12px;
+      }
+      /* 右侧留白防止字压到插画 */
+      .card[data-section="pet"] .check-list { padding-right: 125px; }
+      .card[data-section="prep"] .check-list { padding-right: 85px; }
+      .card[data-section="personal"] .check-list { padding-right: 105px; }
+      .card[data-section="must"] .check-list { padding-right: 90px; }
+    }
+
+    /* 页面底部区域 */
+    .footer {
+      position: relative;
+      text-align: center;
+      padding: 40px 10px 10px;
+      margin-top: 30px;
+    }
+
+    /* 双向卡通小路牌 */
+    .signpost {
+      position: relative;
+      width: 140px;
+      height: 90px;
+      margin: 0 auto 12px;
+    }
+    .post-stick {
+      position: absolute;
+      left: 65px;
+      top: 0;
+      width: 10px;
+      height: 90px;
+      background: #8e6c55;
+      border: 2.5px solid var(--border-color);
+      border-radius: 4px;
+    }
+    .post-sign {
+      position: absolute;
+      width: 110px;
+      height: 26px;
+      background: #bd7b3d;
+      border: 2.5px solid var(--border-color);
+      border-radius: 6px;
+      color: #fff5df;
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 13px;
+      line-height: 21px;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 3px 3px 0 rgba(93, 63, 46, 0.15);
+    }
+    .post-sign.one {
+      left: 5px;
+      top: 12px;
+      transform: rotate(-5deg);
+    }
+    .post-sign.two {
+      left: 20px;
+      top: 40px;
+      transform: rotate(3deg);
+    }
+    .signpost-base {
+      position: absolute;
+      left: 35px;
+      bottom: 0;
+      width: 70px;
+      height: 10px;
+      background: #7bad47;
+      border: 2.5px solid var(--border-color);
+      border-radius: 5px 5px 0 0;
+    }
+    .flower {
+      position: absolute;
+      font-size: 11px;
+      bottom: 4px;
+      pointer-events: none;
+    }
+    .flower.f1 { left: 6px; }
+    .flower.f2 { right: 6px; }
+
+    .footer-text-card {
+      display: inline-block;
+      background: #ffe5b4;
+      border: 2.5px solid var(--border-color);
+      border-radius: 999px;
+      padding: 8px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #7f3b1f;
+      box-shadow: 4px 4px 0 rgba(93, 63, 46, 0.15);
+    }
+
+    /* ==========================================
+       自定义可爱的重置清单二次确认 Modal 框
+       ========================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      backdrop-filter: blur(3px);
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal-card {
+      background: var(--paper-bg);
+      border: 3.5px solid var(--border-color);
+      border-radius: 24px;
+      box-shadow: 6px 6px 0 var(--border-color);
+      width: min(90%, 310px);
+      padding: 22px;
+      text-align: center;
+      transform: scale(0.85);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+    }
+    .modal-overlay.show .modal-card {
+      transform: scale(1);
+    }
+    .modal-header {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      font-size: 20px;
+      color: #17314f;
+      margin-bottom: 10px;
+    }
+    .modal-body {
+      font-size: 14px;
+      color: #7f3b1f;
+      font-weight: bold;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+    .modal-btn {
+      font-family: 'ZCOOL KuaiLe', cursive;
+      border: 3px solid var(--border-color);
+      border-radius: 12px;
+      padding: 8px 18px;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 var(--border-color);
+      transition: all 0.1s;
+    }
+    .modal-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--border-color);
+    }
+    .modal-btn.cancel {
+      background: #bdc3c7;
+      color: #2c3e50;
+    }
+    .modal-btn.confirm {
+      background: #e74c3c;
+      color: white;
+    }
+
+    /* 庆祝彩带粒子层 */
+    #confetti-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 99999;
+      overflow: hidden;
+    }
+    .confetti-particle {
+      position: absolute;
+      z-index: 99999;
+      pointer-events: none;
+    }
+
+    /* ==========================================
+       动效 Keyframes 动画定义
+       ========================================== */
+    @keyframes cardFadeIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes drift {
+      from { transform: translateX(-6px); }
+      to { transform: translateX(8px); }
+    }
+    @keyframes planeFloat {
+      0% { transform: translateY(0) rotate(-10deg); }
+      100% { transform: translateY(-6px) rotate(-6deg); }
+    }
+    @keyframes smokeDrift {
+      0% { transform: translateY(12px) scale(0.6); opacity: 0; }
+      50% { opacity: 0.8; }
+      100% { transform: translateY(-16px) translateX(-6px) scale(1.4); opacity: 0; }
+    }
+    @keyframes tailWag {
+      from { transform: rotate(-12deg); }
+      to { transform: rotate(18deg); }
+    }
+    @keyframes tailWagFast {
+      from { transform: rotate(-25deg); }
+      to { transform: rotate(30deg); }
+    }
+    @keyframes earWobbleL {
+      0%, 100% { transform: rotate(15deg); }
+      50% { transform: rotate(23deg); }
+    }
+    @keyframes earWobbleR {
+      0%, 100% { transform: rotate(-15deg); }
+      50% { transform: rotate(-23deg); }
+    }
+    @keyframes blink {
+      0%, 95%, 100% { transform: scaleY(1); }
+      97.5% { transform: scaleY(0.1); }
+    }
+    @keyframes rainFall {
+      0% { transform: translateY(0); opacity: 0; }
+      30% { opacity: 1; }
+      100% { transform: translateY(20px); opacity: 0; }
+    }
+    @keyframes dogCelebrate {
+      0% { transform: translateY(0) scaleY(1); }
+      100% { transform: translateY(-12px) scaleY(0.96); }
+    }
+    @keyframes heartbeat {
+      from { transform: scale(1); }
+      to { transform: scale(1.08); }
+    }
+    @keyframes heartFloat1 {
+      0% { transform: translate(25px, 20px) scale(0.6); opacity: 0; }
+      50% { opacity: 0.95; }
+      100% { transform: translate(10px, -25px) scale(1.2); opacity: 0; }
+    }
+    @keyframes heartFloat2 {
+      0% { transform: translate(35px, 25px) scale(0.6); opacity: 0; }
+      50% { opacity: 0.95; }
+      100% { transform: translate(50px, -20px) scale(1.2); opacity: 0; }
+    }
+    @keyframes heartFloat3 {
+      0% { transform: translate(30px, 30px) scale(0.6); opacity: 0; }
+      50% { opacity: 0.95; }
+      100% { transform: translate(25px, -35px) scale(1.2); opacity: 0; }
+    }
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 1; }
+      50% { transform: translateY(50vh) rotate(180deg) translateX(40px); opacity: 0.9; }
+      100% { transform: translateY(105vh) rotate(360deg) translateX(-40px); opacity: 0; }
+    }
+
+    /* 触发全完成状态时的小狗联动 */
+    body.all-done .dog {
+      animation: dogCelebrate 0.5s infinite alternate cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    body.all-done .dog-tail {
+      animation: tailWagFast 0.25s infinite alternate ease-in-out;
+    }
+
+    /* 适应系统动画减慢设置 */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01s !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <!-- 顶部 Hero 区域 -->
+    <section class="hero" aria-labelledby="page-title">
+      <div class="cloud one" aria-hidden="true">
+        <svg viewBox="0 0 100 45" width="70" height="32">
+          <path d="M 20,35 A 12,12 0 0,1 32,18 A 16,16 0 0,1 68,18 A 12,12 0 0,1 80,35 Z" fill="white" stroke="#5d3f2e" stroke-width="3" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="cloud two" aria-hidden="true">
+        <svg viewBox="0 0 100 45" width="55" height="25">
+          <path d="M 20,35 A 12,12 0 0,1 32,18 A 16,16 0 0,1 68,18 A 12,12 0 0,1 80,35 Z" fill="white" stroke="#5d3f2e" stroke-width="3" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="plane-path" aria-hidden="true"></div>
+      <div class="plane" aria-hidden="true">✈️</div>
+      <div class="hero-content">
+        <h1 id="page-title"><span class="home-word">回家</span>检查事项清单</h1>
+        <p class="subtitle">出发前，再检查一遍，安心回家！</p>
+      </div>
+      <!-- 底部小画板区 -->
+      <div class="hero-art" aria-hidden="true">
+        <div class="house">
+          <div class="house-chimney"></div>
+          <div class="house-smoke-box">
+            <span class="smoke"></span>
+            <span class="smoke"></span>
+            <span class="smoke"></span>
+          </div>
+          <div class="house-roof"></div>
+          <div class="house-body">
+            <div class="house-window"></div>
+            <div class="house-door"></div>
+          </div>
+        </div>
+        <div class="fence"></div>
+        <div class="suitcase">
+          <div class="suitcase-handle"></div>
+          <div class="suitcase-strap left"></div>
+          <div class="suitcase-strap right"></div>
+          <div class="suitcase-wheel left"></div>
+          <div class="suitcase-wheel right"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 总进度面板 -->
+    <section class="progress-panel" id="summary" aria-live="polite">
+      <div class="progress-head">
+        <h2 class="progress-title">📈 检查总进度</h2>
+        <span class="progress-count" id="total-count">0 / 0 已完成</span>
+      </div>
+      <div class="progress-track" aria-hidden="true">
+        <div class="progress-fill" id="total-fill"></div>
+      </div>
+      <div class="progress-foot">
+        <div class="remaining-box">
+          <span class="remaining-text" id="remaining-count">还剩 0 项</span>
+          <span class="complete-tag" id="complete-message">✨ 全部检查完成，安心回家！</span>
+        </div>
+        <button class="reset-button" type="button" id="btn-reset-trigger">重置清单</button>
+      </div>
+    </section>
+
+    <!-- 卡片面板区域 -->
+    <section class="cards" id="cards-container" aria-label="待检查分类卡片列表"></section>
+
+    <!-- 页面底部 -->
+    <footer class="footer">
+      <div class="signpost" aria-hidden="true">
+        <div class="post-stick"></div>
+        <div class="post-sign one">平安出发</div>
+        <div class="post-sign two">顺利到家 ♥</div>
+        <div class="signpost-base">
+          <span class="flower f1">🌸</span>
+          <span class="flower f2">🌼</span>
+        </div>
+      </div>
+      <div class="footer-text-card">一路平安，家在等你。</div>
+    </footer>
+  </main>
+
+  <!-- 纯 CSS 小狗饺子以及配件的模板 -->
+  <template id="dog-layout-template">
+    <div class="dog-zone" aria-hidden="true">
+      <div class="heart-bubble h1">❤️</div>
+      <div class="heart-bubble h2">💖</div>
+      <div class="heart-bubble h3">💝</div>
+      <div class="dog">
+        <div class="dog-tail"></div>
+        <div class="dog-body"></div>
+        <div class="dog-head">
+          <div class="dog-ear-l"></div>
+          <div class="dog-ear-r"></div>
+          <div class="dog-eye-l"></div>
+          <div class="dog-eye-r"></div>
+          <div class="dog-snout"></div>
+          <div class="dog-nose"></div>
+          <div class="dog-mouth"></div>
+        </div>
+        <div class="dog-bib">饺子</div>
+      </div>
+      <div class="dog-kibble"></div>
+      <div class="dog-bowl"></div>
+      <div class="dog-ball"></div>
+    </div>
+  </template>
+
+  <!-- 重置二次确认模态弹框 -->
+  <div class="modal-overlay" id="confirm-modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">🐾 确定要重置吗？</div>
+      <div class="modal-body">所有已勾选的事项状态都将被清空，需要重新检查哦！</div>
+      <div class="modal-footer">
+        <button class="modal-btn cancel" id="confirm-modal-cancel">算啦</button>
+        <button class="modal-btn confirm" id="confirm-modal-ok">确定重置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 满天星花瓣庆祝效果容器 -->
+  <div id="confetti-container"></div>
+
+  <script>
+    const STORAGE_KEY = "home-check-state-jiaozi-v2";
+
+    // 严谨依照用户指定事项构建的清单数据
+    const sections = [
+      {
+        id: "pet",
+        title: "🐾 小家伙用品",
+        accent: "var(--accent-pet)",
+        hasDog: true,
+        groups: [
+          {
+            items: ["犬粮", "量勺", "零食", "尿布", "梳子", "背带"]
+          }
+        ]
+      },
+      {
+        id: "prep",
+        title: "✈️ 出发前准备",
+        accent: "var(--accent-prep)",
+        hasTravelArt: true,
+        groups: [
+          {
+            items: [
+              "早会开完，关闭pad和笔记本",
+              "关闭窗户",
+              "关闭屋内用电",
+              "水电气关闭检查",
+              "下载b站视频",
+              "选择飞机座位" // 必须是最后一项
+            ]
+          }
+        ]
+      },
+      {
+        id: "personal",
+        title: "🎒 个人随身物品",
+        accent: "var(--accent-carry)",
+        hasPersonalArt: true,
+        groups: [
+          {
+            items: ["手机", "钱包 / 证件", "钥匙", "充电器 / 充电宝", "耳机", "纸巾 / 湿巾", "水杯"]
+          }
+        ]
+      },
+      {
+        id: "must",
+        title: "🎒 必携物品",
+        accent: "var(--accent-must)",
+        hasMustArt: true,
+        groups: [
+          {
+            title: "证件和卡类",
+            items: ["身份证", "门禁卡"] // 只有这两项，严禁多加
+          },
+          {
+            title: "数码产品",
+            items: ["手机充电线", "耳机", "超级充电宝", "Anker大功率充电头", "Switch 2", "笔记本电脑"]
+          },
+          {
+            title: "生活用品",
+            items: ["药品", "洗漱包", "水瓶", "雨伞", "便利贴"]
+          }
+        ]
+      }
+    ];
+
+    let state = loadLocalCheckState();
+    let celebrationTriggered = false;
+
+    const cardsEl = document.getElementById("cards-container");
+    const dogTemplate = document.getElementById("dog-layout-template");
+    const modalEl = document.getElementById("confirm-modal-overlay");
+
+    // 恢复本地存储状态
+    function loadLocalCheckState() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    // 保存本地存储状态
+    function saveLocalCheckState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    // 生成清单状态 Key
+    function makeKey(sectionId, groupIndex, itemIndex) {
+      return `${sectionId}-${groupIndex}-${itemIndex}`;
+    }
+
+    // 渲染所有卡片
+    function renderChecklist() {
+      cardsEl.innerHTML = "";
+
+      sections.forEach((section) => {
+        const card = document.createElement("article");
+        card.className = "card";
+        card.dataset.section = section.id;
+        card.setAttribute("aria-label", section.title);
+
+        // 卡片标题栏和局部进度条
+        const header = document.createElement("header");
+        header.className = "card-header";
+        header.innerHTML = `
+          <h3 class="card-title">${section.title}</h3>
+          <div class="card-progress">
+            <span class="card-progress-text" data-card-progress-id="${section.id}">0 / 0 已完成</span>
+            <div class="card-progress-bar" aria-hidden="true">
+              <div class="card-progress-fill" data-card-fill-id="${section.id}"></div>
+            </div>
+          </div>
+        `;
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        // 分组内列表渲染
+        section.groups.forEach((group, groupIndex) => {
+          const groupWrapper = document.createElement("div");
+          groupWrapper.className = "subcategory";
+
+          if (group.title) {
+            const subtitle = document.createElement("h4");
+            subtitle.className = "subcategory-title";
+            subtitle.textContent = group.title;
+            groupWrapper.appendChild(subtitle);
+          }
+
+          const ul = document.createElement("ul");
+          ul.className = "check-list";
+
+          group.items.forEach((text, itemIndex) => {
+            const itemKey = makeKey(section.id, groupIndex, itemIndex);
+            const isDone = !!state[itemKey];
+
+            const li = document.createElement("li");
+            li.className = `check-item${isDone ? " done" : ""}`;
+            li.dataset.key = itemKey;
+            li.setAttribute("role", "checkbox");
+            li.setAttribute("aria-checked", isDone ? "true" : "false");
+            li.tabIndex = 0;
+
+            li.innerHTML = `
+              <span class="box" aria-hidden="true"></span>
+              <span class="item-text">${text}</span>
+            `;
+
+            ul.appendChild(li);
+          });
+
+          groupWrapper.appendChild(ul);
+          body.appendChild(groupWrapper);
+        });
+
+        // 插入 CSS 卡通插画
+        if (section.hasDog) {
+          body.appendChild(dogTemplate.content.cloneNode(true));
+        }
+
+        if (section.hasTravelArt) {
+          const travelArt = document.createElement("div");
+          travelArt.className = "travel-art";
+          travelArt.setAttribute("aria-hidden", "true");
+          travelArt.innerHTML = `
+            <div class="tiny-cloud"></div>
+            <div class="tiny-plane-draw"></div>
+          `;
+          body.appendChild(travelArt);
+        }
+
+        if (section.hasPersonalArt) {
+          const personalArt = document.createElement("div");
+          personalArt.className = "personal-art";
+          personalArt.setAttribute("aria-hidden", "true");
+          personalArt.innerHTML = `
+            <div class="flask-draw"></div>
+            <div class="wallet-draw"></div>
+            <div class="keys-draw"></div>
+            <div class="phone-draw"></div>
+          `;
+          body.appendChild(personalArt);
+        }
+
+        if (section.hasMustArt) {
+          const mustArt = document.createElement("div");
+          mustArt.className = "must-art";
+          mustArt.setAttribute("aria-hidden", "true");
+          mustArt.innerHTML = `
+            <div class="umbrella-draw">
+              <div class="umbrella-canopy"></div>
+              <div class="umbrella-shaft"></div>
+              <div class="umbrella-handle"></div>
+            </div>
+            <div class="rain-draw">
+              <span class="drop"></span>
+              <span class="drop"></span>
+              <span class="drop"></span>
+            </div>
+          `;
+          body.appendChild(mustArt);
+        }
+
+        card.appendChild(header);
+        card.appendChild(body);
+        cardsEl.appendChild(card);
+      });
+
+      calculateProgress();
+    }
+
+    // 计算总进度与各模块进度
+    function calculateProgress() {
+      let grandTotal = 0;
+      let grandDone = 0;
+
+      sections.forEach((section) => {
+        let sectionTotal = 0;
+        let sectionDone = 0;
+
+        section.groups.forEach((group, groupIndex) => {
+          group.items.forEach((_, itemIndex) => {
+            sectionTotal++;
+            grandTotal++;
+            const itemKey = makeKey(section.id, groupIndex, itemIndex);
+            if (state[itemKey]) {
+              sectionDone++;
+              grandDone++;
+            }
+          });
+        });
+
+        // 更新单个卡片进度条
+        const countText = document.querySelector(`[data-card-progress-id="${section.id}"]`);
+        const fillBar = document.querySelector(`[data-card-fill-id="${section.id}"]`);
+        if (countText) countText.textContent = `${sectionDone} / ${sectionTotal} 已完成`;
+        if (fillBar) {
+          const pct = sectionTotal > 0 ? (sectionDone / sectionTotal) * 100 : 0;
+          fillBar.style.width = `${pct}%`;
+        }
+      });
+
+      // 更新总进度条与面板数据
+      const remainingCount = grandTotal - grandDone;
+      document.getElementById("total-count").textContent = `${grandDone} / ${grandTotal} 已完成`;
+      document.getElementById("remaining-count").textContent = `还剩 ${remainingCount} 项`;
+      
+      const grandPct = grandTotal > 0 ? (grandDone / grandTotal) * 100 : 0;
+      document.getElementById("total-fill").style.width = `${grandPct}%`;
+
+      // 联动 Body 的 all-done 类用于动画控制
+      const isComplete = grandTotal > 0 && grandDone === grandTotal;
+      document.body.classList.toggle("all-done", isComplete);
+
+      if (isComplete) {
+        if (!celebrationTriggered) {
+          triggerCelebrationConfetti();
+          celebrationTriggered = true;
+        }
+      } else {
+        celebrationTriggered = false;
+      }
+    }
+
+    // 单项点击切换状态逻辑
+    function handleToggle(itemEl) {
+      const key = itemEl.dataset.key;
+      const isDoneNow = !state[key];
+      state[key] = isDoneNow;
+      
+      itemEl.classList.toggle("done", isDoneNow);
+      itemEl.setAttribute("aria-checked", isDoneNow ? "true" : "false");
+      
+      saveLocalCheckState();
+      calculateProgress();
+    }
+
+    // 庆祝花瓣彩屑飘落粒子特效
+    function triggerCelebrationConfetti() {
+      const container = document.getElementById("confetti-container");
+      container.innerHTML = "";
+      const colors = ['#f5b041', '#3498db', '#7bad47', '#3c8f62', '#ff6b6b', '#f1c40f', '#9b59b6'];
+      const shapes = ['circle', 'square', 'heart'];
+
+      for (let i = 0; i < 70; i++) {
+        const particle = document.createElement("div");
+        particle.className = "confetti-particle";
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+
+        particle.style.left = Math.random() * 100 + "vw";
+        particle.style.top = -(Math.random() * 30 + 20) + "px";
+        particle.style.width = (Math.random() * 8 + 8) + "px";
+        particle.style.height = particle.style.width;
+
+        if (shape === 'heart') {
+          particle.style.backgroundColor = 'transparent';
+          particle.innerHTML = `<svg viewBox="0 0 32 32" style="fill:${color}; width:100%; height:100%;"><path d="M16,28.261L3.921,16.182C1.353,13.613,1.353,9.452,3.921,6.883c2.569-2.569,6.73-2.569,9.299,0L16,9.684l2.78-2.801c2.569-2.569,6.73-2.569,9.299,0c2.568,2.569,2.568,6.73,0,9.299L16,28.261z"/></svg>`;
+        } else if (shape === 'circle') {
+          particle.style.backgroundColor = color;
+          particle.style.borderRadius = "50%";
+        } else {
+          particle.style.backgroundColor = color;
+        }
+
+        const duration = Math.random() * 2.5 + 2;
+        const delay = Math.random() * 1.5;
+        particle.style.animation = `fall ${duration}s linear ${delay}s forwards`;
+        container.appendChild(particle);
+      }
+    }
+
+    // 绑定事件
+    cardsEl.addEventListener("click", (e) => {
+      const checkItem = e.target.closest(".check-item");
+      if (checkItem) handleToggle(checkItem);
+    });
+
+    cardsEl.addEventListener("keydown", (e) => {
+      const checkItem = e.target.closest(".check-item");
+      if (checkItem && (e.key === " " || e.key === "Enter")) {
+        e.preventDefault();
+        handleToggle(checkItem);
+      }
+    });
+
+    // 重置清单模态弹窗逻辑
+    const resetTriggerBtn = document.getElementById("btn-reset-trigger");
+    const cancelModalBtn = document.getElementById("confirm-modal-cancel");
+    const okModalBtn = document.getElementById("confirm-modal-ok");
+
+    resetTriggerBtn.addEventListener("click", () => {
+      modalEl.classList.add("show");
+    });
+
+    cancelModalBtn.addEventListener("click", () => {
+      modalEl.classList.remove("show");
+    });
+
+    okModalBtn.addEventListener("click", () => {
+      modalEl.classList.remove("show");
+      
+      // 清空所有的状态
+      state = {};
+      saveLocalCheckState();
+      
+      // 更新页面中各项的样式
+      document.querySelectorAll(".check-item").forEach((el) => {
+        el.classList.remove("done");
+        el.setAttribute("aria-checked", "false");
+      });
+
+      calculateProgress();
+    });
+
+    // 遮罩层点击也算取消
+    modalEl.addEventListener("click", (e) => {
+      if (e.target === modalEl) {
+        modalEl.classList.remove("show");
+      }
+    });
+
+    // 初始化运行
+    renderChecklist();
+  </script>
+</body>
+</html>
